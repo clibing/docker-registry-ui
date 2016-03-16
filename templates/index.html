@@ -1,0 +1,79 @@
+<html>
+<head>
+    <title>docker-registry-ui</title>
+    <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/bootstrap.min.css')}}>
+    <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/dataTables.bootstrap.min.css')}}>
+</head>
+<body>
+    <div class="container">
+        {% if data %}
+        <h1 class="page-header"> Repositories </h1>
+        {% elif info %}
+        <h1 class="page-header"> Tag </h1>
+        {% endif %}
+        <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            {% if info %}
+             <li class="active">{{repository}}</li>
+            {% endif %}
+        </ol>
+        <table class="table table-striped table-bordered">
+            {% if data %}
+            <thead>
+                <tr>
+                    <th>Repository</th>
+                    <th>Tag</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in data %}
+                <tr>
+                    <td><a href="#">{{ i }}<a></td>
+                    <td>{{ data[i]|length }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% elif info %}
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tag</th>
+                    <th>Digest</th>
+                    <th>Created</th>
+                    <th>Fslayers</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in info %}
+                    {% if i %}
+                    <tr>
+                        <td>{{ i.id }}</td>
+                        <td>{{ i.tag }}</td>
+                        <td>{{ i.digest }}</td>
+                        <td>{{ i.created }}</td>
+                        <td>{{ i.fslayers }}</td>
+                        <td>{{ i.size }}MB</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+            {% endif %}
+        </table>
+    </div>
+</body>
+<script src={{url_for('static', filename='js/jquery-1.12.0.min.js')}}></script>
+<script src={{url_for('static', filename='js/bootstrap.js')}}></script>
+<script src={{url_for('static', filename='js/jquery.dataTables.min.js')}}></script>
+<script src={{url_for('static', filename='js/dataTables.bootstrap.min.js')}}></script>
+<script type="text/javascript">
+    ;$(function(){
+        $("table").DataTable();
+        $('td>a').click(function(){
+            repository = $(this).text()
+            repository = repository.replace('/','%')
+            window.location.href='/tags/'+repository
+        });
+    });
+</script>
+</html>
