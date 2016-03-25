@@ -1,5 +1,7 @@
 FROM alpine
 
+MAINTAINER lioncui@163.com
+
 RUN apk add --update python python-dev py-pip && \
     pip install flask && \
     rm /var/cache/apk/*
