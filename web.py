@@ -30,5 +30,5 @@ def tags(repository):
         data.append(g.reg.digest(repository, tag))
     return render_template('index.html', repository = repository, info = data)
 
-app.debug = True
-app.run()
+app.debug = False
+app.run(host='0.0.0.0',port=8080)
