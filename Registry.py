@@ -58,10 +58,11 @@ class V2(object):
             created_time = created_time[:-4]
             created_time = datetime.datetime.strptime(created_time, "%Y-%m-%dT%H:%M:%S.%f")
             created_time = created_time - datetime.timedelta(0, time.timezone)
-            redata['created'] = created_time.strftime("%Y-%m-%d %H:%M")
+            redata['created'] = created_time.strftime("%Y-%m-%d %H:%M:%S")
             redata['fslayers'] = len(html['fsLayers'])
             redata['size'] = size / 1024 /1024
             redata['digest'] = r.headers['Docker-Content-Digest']
+            redata['reference'] = r.headers['Docker-Content-Digest'].replace(':', '%3a')
             return redata
         except:
             return None
@@ -71,3 +72,17 @@ class V2(object):
         for i in self.catalog():
             self.retags[i] = self.tags(i)
         return self.retags
+
+    def delete(self, repository, reference):
+        headers = self.headers
+        headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        req = urllib2.Request(self.url + '/' + repository + '/' + reference.replace(':', '%3a'), data='1=1', headers=self.headers)
+        try:
+            r = urllib2.urlopen(req)
+            if r.getCode() == 202:
+                return True
+            return False
+        except Exception as e:
+            print("delete image is exception: %s", e)
+            return None
+

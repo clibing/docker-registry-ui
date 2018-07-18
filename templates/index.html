@@ -42,6 +42,7 @@
                     <th>Created</th>
                     <th>Fslayers</th>
                     <th>Size</th>
+                    <th>Manager</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +55,7 @@
                         <td>{{ i.created }}</td>
                         <td>{{ i.fslayers }}</td>
                         <td>{{ i.size }}MB</td>
+                        <td><a href="/tags/{{ repository }}/{{ i.reference  }}">Delete</a></td>
                     </tr>
                     {% endif %}
                 {% endfor %}
