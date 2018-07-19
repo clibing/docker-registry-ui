@@ -62,7 +62,6 @@ class V2(object):
             redata['fslayers'] = len(html['fsLayers'])
             redata['size'] = size / 1024 /1024
             redata['digest'] = r.headers['Docker-Content-Digest']
-            redata['reference'] = r.headers['Docker-Content-Digest'].replace(':', '%3a')
             return redata
         except:
             return None
@@ -74,9 +73,8 @@ class V2(object):
         return self.retags
 
     def delete(self, repository, reference):
-        headers = self.headers
-        headers['Content-Type'] = 'application/x-www-form-urlencoded'
-        req = urllib2.Request(self.url + '/' + repository + '/' + reference.replace(':', '%3a'), data='1=1', headers=self.headers)
+        req = urllib2.Request(self.url + '/' + repository + '/manifests/' + reference.replace(':', '%3a'), headers=self.headers)
+        req.get_method = lambda: 'DELETE'
         try:
             r = urllib2.urlopen(req)
             if r.getCode() == 202:
