@@ -52,6 +52,12 @@ def delete():
         return render_template('error.html', repository=repository, error='error or not exist')
 
 
-print app.config
-print app.root_path
+def replace_backslash(value):
+    if value:
+        return str(value).replace('/', '%2f')
+    return value
+
+
+app.add_template_filter(replace_backslash, 'replace_backslash')
+app.logger.debug("app.root_path: %s" % app.root_path)
 app.run(host='0.0.0.0', port=8080)

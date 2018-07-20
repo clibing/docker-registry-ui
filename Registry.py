@@ -10,6 +10,7 @@ class V2(object):
     '''
     Connect Private Registry Restful API v2
     '''
+
     def __init__(self, url, user=None, password=None, debug=False):
         '''
         url: Registry Service URL
@@ -80,7 +81,8 @@ class V2(object):
             return re_data
         except Exception as e:
             if self.__debug:
-                print("cause execption when digest the response: %s, the tag: %s, detail execption: %s" % (response, tag, e))
+                print("cause execption when digest the response: %s, the tag: %s, detail execption: %s" % (
+                    response, tag, e))
             return None
         finally:
             pass
@@ -104,3 +106,4 @@ class V2(object):
         except Exception as e:
             print("delete image is exception: %s", e)
             return None
+

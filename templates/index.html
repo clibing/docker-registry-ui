@@ -30,7 +30,7 @@
                 <tbody>
                     {% for i in data %}
                     <tr>
-                        <td><a href="/tags?repository={{ i }}">{{ i }}</a></td>
+                        <td><a href="/tags?repository={{ i | replace_backslash }}">{{ i }}</a></td>
                         <td>{{ data[i]|length }}</td>
                     </tr>
                     {% endfor %}
