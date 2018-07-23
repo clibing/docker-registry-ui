@@ -10,12 +10,12 @@ user = os.getenv("USER")
 passwd = os.getenv('PASSWD')
 debug = os.getenv('DEBUG', False)
 
-if __name__ == '__main__':
-    host = '172.16.0.36'
-    port = '5000'
-    user = 'admin'
-    passwd = 'admin'
-    debug = True
+#if __name__ == '__main__':
+#    host = '172.16.0.36'
+#    port = '5000'
+#    user = 'admin'
+#    passwd = 'admin'
+#    debug = True
 app.debug = debug
 
 
@@ -45,7 +45,7 @@ def tags():
 @app.route('/delete')
 def delete():
     repository = request.args.get('repository')
-    reference = request.args.get('reference')
+    reference = request.args.get('reference') 
     if g.reg.delete(repository, reference):
         return tags(repository)
     else:
