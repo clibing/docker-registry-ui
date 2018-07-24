@@ -20,7 +20,7 @@
     <br/>
     <div class="row">
         <div class="span4">
-            <div class="alert alert-danger">
+            <div class="alert {% if not danger %}alert-success{% else %}alert-danger{% endif %}">
                 <a class="close" data-dismiss="alert">×</a>
                 <h4 class="alert-heading">Warning!</h4>
                 {{ error }}

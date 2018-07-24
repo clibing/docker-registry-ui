@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, g, render_template, redirect
+from flask import Flask, request, g, render_template, redirect, url_for
 from Registry import V2
 import os
 import time
@@ -40,7 +40,8 @@ def tags():
             data.append(g.reg.digest(repository, tag))
         return render_template('index.html', repository=repository, info=data, uri=uri)
     else:
-        return render_template('error.html', error="the repository %s is deleted, cache hit" % repository, url="/")
+        return render_template('redirect.html', error="the repository %s is deleted, cache hit" % repository,
+                               danger=True, url="/", timeout=3)
 
 
 @app.route('/delete')
@@ -52,9 +53,10 @@ def delete():
     message = result[1]
     if status:
         time.sleep(1)
-        return redirect("/tags?repository=%s" % replace_backslash(repository))
+        red_uri = "/tags?repository=%s" % (replace_backslash(repository))
+        return render_template('redirect.html', error="delete success, auto jump", url=red_uri, danger=False, timeout=1)
     else:
-        return render_template('error.html', error=message, url="/")
+        return render_template('redirect.html', error=message, url="/", danger=True, timeout=3)
 
 
 def replace_backslash(value):
