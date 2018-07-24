@@ -40,7 +40,7 @@ def tags():
             data.append(g.reg.digest(repository, tag))
         return render_template('index.html', repository=repository, info=data, uri=uri)
     else:
-        return render_template('error.html', error="the repository %s is deleted, cache hit" % repository)
+        return render_template('error.html', error="the repository %s is deleted, cache hit" % repository, url="/")
 
 
 @app.route('/delete')
@@ -54,7 +54,7 @@ def delete():
         time.sleep(1)
         return redirect("/tags?repository=%s" % replace_backslash(repository))
     else:
-        return render_template('error.html', error=message)
+        return render_template('error.html', error=message, url="/")
 
 
 def replace_backslash(value):
