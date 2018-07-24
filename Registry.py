@@ -43,10 +43,14 @@ class V2(object):
         return repos['repositories']
 
     def tags(self, response):
-        req = urllib2.Request(self.url + '/' + response + '/tags/list', headers=self.headers)
-        r = urllib2.urlopen(req)
-        tags = json.loads(r.read())
-        return tags['tags']
+        try:
+            req = urllib2.Request(self.url + '/' + response + '/tags/list', headers=self.headers)
+            r = urllib2.urlopen(req)
+            tags = json.loads(r.read())
+            return tags['tags']
+        except Exception as e:
+            return None
+
 
     def add_schema(self):
         self.headers['Accept'] = self.__schema
@@ -86,7 +90,12 @@ class V2(object):
     def repository_tags(self):
         re_tags = {}
         for i in self.catalog():
-            re_tags[i] = self.tags(i)
+            re_tag = self.tags(i)
+            if re_tag:
+                re_tags[i] = re_tag
+            else:
+                continue
+
         return re_tags
 
     def delete(self, repository, tag):
