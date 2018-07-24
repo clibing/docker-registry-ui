@@ -3,71 +3,107 @@
 
 import urllib2, json, base64, datetime, time
 
+BASE_CONTENT_TYPE = 'application/vnd.docker.distribution.manifest'
+
+
 class V2(object):
     '''
     Connect Private Registry Restful API v2
     '''
-    def __init__(self, url, user = None, password = None):
+
+    def __init__(self, url, user=None, password=None, debug=False):
         '''
         url: Registry Service URL
         user: Basic Authorization User,default None
         pasword: Basic Authorization Password,default None
         '''
-        self.url = url+'/v2'
+        self.url = url + '/v2'
+        self.__debug = debug
+        self.__schema = BASE_CONTENT_TYPE + '.v2+json'
         if user and password:
-            secret = base64.encodestring("%s:%s" % (user,password))
-            secret = secret.replace('\n','')
+            secret = base64.encodestring("%s:%s" % (user, password))
+            secret = secret.replace('\n', '')
             self.headers = {
-                                'Authorization':'Basic %s' %secret
-                            }
+                'Authorization': 'Basic %s' % secret
+            }
 
     def _ping(self):
         try:
-            req = urllib2.Request(self.url,headers = self.headers)
-            r = urllib2.urlopen(req)
+            req = urllib2.Request(self.url, headers=self.headers)
+            urllib2.urlopen(req)
             return 'OK'
-        except:
+        except Exception as e:
+            if self.__debug:
+                print("execption when ping url: %s, the execption: %s" % (self.url, e))
             return 'Error'
 
     def catalog(self):
-        req = urllib2.Request(self.url+"/_catalog",headers = self.headers)
+        req = urllib2.Request(self.url + "/_catalog", headers=self.headers)
         r = urllib2.urlopen(req)
         repos = json.loads(r.read())
         return repos['repositories']
-        
+
     def tags(self, response):
-        req = urllib2.Request(self.url+'/'+response+'/tags/list',headers=self.headers)
+        req = urllib2.Request(self.url + '/' + response + '/tags/list', headers=self.headers)
         r = urllib2.urlopen(req)
         tags = json.loads(r.read())
         return tags['tags']
-        
+
+    def add_schema(self):
+        self.headers['Accept'] = self.__schema
+
+    def remove_schema(self):
+        self.headers.pop('Accept')
+
     def digest(self, response, tag):
-        redata = {}
-        req = urllib2.Request(self.url+'/'+response+'/manifests/'+tag,headers=self.headers)
+        re_data = {}
+        # self.add_schema()
+        req = urllib2.Request(self.url + '/' + response + '/manifests/' + tag, headers=self.headers)
         try:
             r = urllib2.urlopen(req)
             html = json.loads(r.read())
-            size = 0 
+            size = 0
             for i in html['history']:
                 if 'Size' in json.loads(i['v1Compatibility']):
                     size += json.loads(i['v1Compatibility'])['Size']
 
-            redata['tag'] = tag
-            redata['id'] = json.loads(html['history'][0]['v1Compatibility'])['id'][:13]
-            created_time = json.loads(html['history'][0]['v1Compatibility'])['created']
+            re_data['tag'] = tag
+            v1_compatibility = json.loads(html['history'][0]['v1Compatibility']);
+            re_data['id'] = v1_compatibility['id'][:13]
+            created_time = v1_compatibility['created']
             created_time = created_time[:-4]
             created_time = datetime.datetime.strptime(created_time, "%Y-%m-%dT%H:%M:%S.%f")
             created_time = created_time - datetime.timedelta(0, time.timezone)
-            redata['created'] = created_time.strftime("%Y-%m-%d %H:%M")
-            redata['fslayers'] = len(html['fsLayers'])
-            redata['size'] = size / 1024 /1024
-            redata['digest'] = r.headers['Docker-Content-Digest']
-            return redata
-        except:
+            re_data['created'] = created_time.strftime("%Y-%m-%d %H:%M:%S")
+            re_data['fslayers'] = len(html['fsLayers'])
+            re_data['size'] = size / 1024 / 1024
+            re_data['digest'] = r.headers['Docker-Content-Digest']
+            return re_data
+        except Exception as e:
+            if self.__debug:
+                print("cause execption when digest the response: %s, the tag: %s, detail execption: %s" % (
+                    response, tag, e))
             return None
-    
+        finally:
+            pass
+            # self.remove_schema()
+
     def retag(self):
         self.retags = {}
         for i in self.catalog():
             self.retags[i] = self.tags(i)
         return self.retags
+
+    def delete(self, repository, reference):
+        req = urllib2.Request(self.url + '/' + repository + '/manifests/' + reference.replace(':', '%3a'),
+                              headers=self.headers)
+        req.get_method = lambda: 'DELETE'
+        try:
+            r = urllib2.urlopen(req)
+            if r.getCode() == 202:
+                return True
+            return False
+        except Exception as e:
+            print("delete image is exception: %s", e)
+            return None
+

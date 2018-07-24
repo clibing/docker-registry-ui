@@ -1,12 +1,6 @@
-FROM alpine
+FROM clibing/armhf-python-flask:2.7
 
-MAINTAINER lioncui@163.com
-
-RUN apk add --update python python-dev py-pip && \
-    pip install flask && \
-    rm /var/cache/apk/*
-
-ADD localtime /etc/localtime
+MAINTAINER clibing <wmsjhappy@gmail.com>
 
 ADD . /webapp/
 
@@ -15,4 +9,3 @@ WORKDIR /webapp
 EXPOSE 8080/tcp
 
 CMD ["/usr/bin/python","web.py"]
-

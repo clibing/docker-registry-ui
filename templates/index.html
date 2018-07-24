@@ -5,59 +5,63 @@
     <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/dataTables.bootstrap.min.css')}}>
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid">
         {% if data %}
         <h1 class="page-header"> Repositories </h1>
         {% elif info %}
         <h1 class="page-header"> Tag </h1>
         {% endif %}
+
         <ol class="breadcrumb">
             <li><a href="/">Home</a></li>
             {% if info %}
              <li class="active">{{repository}}</li>
             {% endif %}
         </ol>
+
         <table class="table table-striped table-bordered">
             {% if data %}
-            <thead>
-                <tr>
-                    <th>Repository</th>
-                    <th>Tag</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in data %}
-                <tr>
-                    <td><a href="#">{{ i }}<a></td>
-                    <td>{{ data[i]|length }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            {% elif info %}
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tag</th>
-                    <th>Digest</th>
-                    <th>Created</th>
-                    <th>Fslayers</th>
-                    <th>Size</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in info %}
-                    {% if i %}
+                <thead>
                     <tr>
-                        <td>{{ i.id }}</td>
-                        <td>{{ i.tag }}</td>
-                        <td>{{ i.digest }}</td>
-                        <td>{{ i.created }}</td>
-                        <td>{{ i.fslayers }}</td>
-                        <td>{{ i.size }}MB</td>
+                        <th>Repository</th>
+                        <th>Tag</th>
                     </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
+                </thead>
+                <tbody>
+                    {% for i in data %}
+                    <tr>
+                        <td><a href="/tags?repository={{ i | replace_backslash }}">{{ i }}</a></td>
+                        <td>{{ data[i]|length }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            {% elif info %}
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tag</th>
+                        <th>Digest</th>
+                        <th>Created</th>
+                        <th>Fslayers</th>
+                        <th>Size</th>
+                        <th>Del</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in info %}
+                        {% if i %}
+                        <tr>
+                            <td>{{ i.id }}</td>
+                            <td>{{ i.tag }}</td>
+                            <td>{{ i.digest }}</td>
+                            <td>{{ i.created }}</td>
+                            <td>{{ i.fslayers }}</td>
+                            <td>{{ i.size }}MB</td>
+                            <td><a href="/tags/{{ repository }}/{{ i.digest }}">Del</a></td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
             {% endif %}
         </table>
     </div>
@@ -69,11 +73,6 @@
 <script type="text/javascript">
     ;$(function(){
         $("table").DataTable();
-        $('td>a').click(function(){
-            repository = $(this).text()
-            repository = repository.replace('/','%')
-            window.location.href='/tags/'+repository
-        });
     });
 </script>
 </html>
