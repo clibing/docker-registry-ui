@@ -14,10 +14,12 @@ build-image:
     - echo "IMAGE_NAME ${IMAGE_NAME}"
     - echo "DOCKER_REGISTRY ${DOCKER_REGISTRY}"
     - docker build -t ${IMAGE_NAME} .
-    - docker push ${IMAGE_NAME}
     - docker tag -t ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}
-    - docker rmi ${IMAGE_NAME}
+    - docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
+    - docker push ${IMAGE_NAME}
+    - docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}
     - docker rmi ${DOCKER_REGISTRY}/${IMAGE_NAME}
+    - docker rmi ${IMAGE_NAME}
   tags:
     - raspberrypi
   when: manual
