@@ -1,11 +1,20 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
     <title>docker-registry-ui</title>
     <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/bootstrap.min.css')}}>
     <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/dataTables.bootstrap.min.css')}}>
+    <link rel="shortcut icon" href={{url_for('static', filename='favicon.ico')}}>
+    <link rel="apple-touch-icon" sizes="128x128" href={{url_for('static', filename='favicon-128x128.ico')}} />
+    <style>
+        .wrap{
+            padding: 0 100px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid wrap">
         {% if data %}
         <h1 class="page-header"> Repositories </h1>
         {% elif info %}
@@ -40,6 +49,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Tag</th>
+                        <th>Pull</th>
                         <th>Digest</th>
                         <th>Created</th>
                         <th>Fslayers</th>
@@ -53,11 +63,12 @@
                         <tr>
                             <td>{{ i.id }}</td>
                             <td>{{ i.tag }}</td>
+                            <td>docker pull {{ uri }}/{{ repository }}:{{ i.tag }}</td>
                             <td>{{ i.digest }}</td>
                             <td>{{ i.created }}</td>
                             <td>{{ i.fslayers }}</td>
                             <td>{{ i.size }}MB</td>
-                            <td><a href="/tags/{{ repository }}/{{ i.digest }}">Del</a></td>
+                            <td><a href="/delete?repository={{ repository }}&reference={{ i.digest }}">Del</a></td>
                         </tr>
                         {% endif %}
                     {% endfor %}

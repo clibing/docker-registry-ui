@@ -9,13 +9,7 @@ port = os.getenv("PORT", "5000")
 user = os.getenv("USER")
 passwd = os.getenv('PASSWD')
 debug = os.getenv('DEBUG', False)
-
-#if __name__ == '__main__':
-#    host = '172.16.0.36'
-#    port = '5000'
-#    user = 'admin'
-#    passwd = 'admin'
-#    debug = True
+uri = "%s:%s" % (host, port)
 app.debug = debug
 
 
@@ -39,7 +33,7 @@ def tags():
     data = []
     for tag in g.reg.tags(repository):
         data.append(g.reg.digest(repository, tag))
-    return render_template('index.html', repository=repository, info=data)
+    return render_template('index.html', repository=repository, info=data, uri=uri)
 
 
 @app.route('/delete')

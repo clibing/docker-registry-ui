@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>docker-registry-ui</title>
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/bootstrap.min.css') }}>
+    <link rel="shortcut icon" href={{ url_for('static', filename='favicon.ico') }}>
+    <link rel="apple-touch-icon" sizes="128x128" href={{ url_for('static', filename='favicon-128x128.ico') }}/>
+</head>
+
+<body>
+<div class="container">
+    <br/>
+    <div class="row">
+        <div class="span4">
+            <div class="alert alert-danger">
+                <a class="close" data-dismiss="alert">×</a>
+                <h4 class="alert-heading">Warning!</h4>
+                {{ error }}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src={{ url_for('static', filename='js/jquery-1.12.0.min.js') }}></script>
+<script src={{ url_for('static', filename='js/bootstrap.js') }}></script>
+</html>
