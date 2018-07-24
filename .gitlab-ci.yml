@@ -10,7 +10,7 @@ build-image:
   stage: build
   script:
     - export BUILD_DATE=`date +%Y%m%d%H%M%S`
-    - export IMAGE_NAME=${DOCKER_USER}/armhf-docker-registry-ui:${BUILD_DATE}
+    - export IMAGE_NAME=${DOCKER_REGISTRY_USER}/armhf-docker-registry-ui:${BUILD_DATE}
     - echo "IMAGE_NAME ${IMAGE_NAME}"
     - echo "DOCKER_REGISTRY ${DOCKER_REGISTRY}"
     - docker build -t ${IMAGE_NAME} .
