@@ -1,22 +1,21 @@
 #!/usr/bin/python
 # -*- coding:UTF-8 -*-
 
-import urllib2, json, base64, datetime, time
-
+import base64
+import datetime
+import json
+import time
+import urllib2
 BASE_CONTENT_TYPE = 'application/vnd.docker.distribution.manifest'
 
 
 class V2(object):
-    '''
-    Connect Private Registry Restful API v2
-    '''
-
+    # Connect Private Registry Restful API v2
     def __init__(self, url, user=None, password=None, debug=False):
-        '''
-        url: Registry Service URL
-        user: Basic Authorization User,default None
-        pasword: Basic Authorization Password,default None
-        '''
+        # url: Registry Service URL
+        # user: Basic Authorization User,default None
+        # password: Basic Authorization Password,default None
+
         self.url = url + '/v2'
         self.__debug = debug
         self.__schema = BASE_CONTENT_TYPE + '.v2+json'
@@ -34,7 +33,7 @@ class V2(object):
             return 'OK'
         except Exception as e:
             if self.__debug:
-                print("execption when ping url: %s, the execption: %s" % (self.url, e))
+                print("exception when ping url: %s, the execption: %s" % (self.url, e))
             return 'Error'
 
     def catalog(self):
@@ -67,7 +66,7 @@ class V2(object):
                     size += json.loads(i['v1Compatibility'])['Size']
 
             re_data['tag'] = tag
-            v1_compatibility = json.loads(html['history'][0]['v1Compatibility']);
+            v1_compatibility = json.loads(html['history'][0]['v1Compatibility'])
             re_data['id'] = v1_compatibility['id'][:13]
             created_time = v1_compatibility['created']
             created_time = created_time[:-4]
@@ -80,30 +79,29 @@ class V2(object):
             return re_data
         except Exception as e:
             if self.__debug:
-                print("cause execption when digest the response: %s, the tag: %s, detail execption: %s" % (
+                print("cause exception when digest the response: %s, the tag: %s, detail execption: %s" % (
                     response, tag, e))
             return None
-        finally:
-            # self.remove_schema()
-            pass
 
-    def retag(self):
-        self.retags = {}
+    def repository_tags(self):
+        re_tags = {}
         for i in self.catalog():
-            self.retags[i] = self.tags(i)
-        return self.retags
+            re_tags[i] = self.tags(i)
+        return re_tags
 
     def delete(self, repository, tag):
         self.add_schema()
         try:
             req = urllib2.Request(self.url + '/' + repository + '/manifests/' + tag, headers=self.headers)
             r = urllib2.urlopen(req)
-            if r.code == 404:
-                return False, "the %s:%s not found, may be deleted" % (repository, tag)
             digest = r.headers['docker-content-digest']
         except urllib2.URLError as e:
-            return False, "get %s:%s digest is error, the code: %s" % (repository, tag, e.code)
+            if r.code == 404:
+                return False, "the %s:%s not found, may be deleted" % (repository, tag)
+            else:
+                return False, "get %s:%s digest is error, the code: %s" % (repository, tag, e.code)
         finally:
+            r.close()
             self.remove_schema()
 
         # send DELETE the image
@@ -116,3 +114,5 @@ class V2(object):
             return False, "the code：%s" % r.code
         except urllib2.URLError as e:
             return False, "delete image is exception, the code: %s" % e.code
+        finally:
+            r.close()

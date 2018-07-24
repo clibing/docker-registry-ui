@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from flask import Flask, request, g, render_template
 from Registry import V2
 import os
@@ -22,7 +24,7 @@ def connect():
 @app.route('/')
 def index():
     if g.reg._ping() == 'OK':
-        return render_template('index.html', data=g.reg.retag())
+        return render_template('index.html', data=g.reg.repository_tags())
     else:
         return "Failed to access registry", 502
 
