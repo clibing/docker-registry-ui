@@ -3,6 +3,7 @@
 from flask import Flask, request, g, render_template
 from Registry import V2
 import os
+import time
 
 app = Flask(__name__)
 
@@ -46,6 +47,7 @@ def delete():
     status = result[0]
     message = result[1]
     if status:
+        time.sleep(2)
         return tags(repository)
     else:
         return render_template('error.html', repository=repository, error=message)
