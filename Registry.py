@@ -57,7 +57,6 @@ class V2(object):
 
     def digest(self, response, tag):
         re_data = {}
-        # self.add_schema()
         req = urllib2.Request(self.url + '/' + response + '/manifests/' + tag, headers=self.headers)
         try:
             r = urllib2.urlopen(req)
@@ -85,8 +84,8 @@ class V2(object):
                     response, tag, e))
             return None
         finally:
-            pass
             # self.remove_schema()
+            pass
 
     def retag(self):
         self.retags = {}
@@ -94,16 +93,26 @@ class V2(object):
             self.retags[i] = self.tags(i)
         return self.retags
 
-    def delete(self, repository, reference):
-        req = urllib2.Request(self.url + '/' + repository + '/manifests/' + reference.replace(':', '%3a'),
-                              headers=self.headers)
+    def delete(self, repository, tag):
+        self.add_schema()
+        try:
+            req = urllib2.Request(self.url + '/' + repository + '/manifests/' + tag, headers=self.headers)
+            r = urllib2.urlopen(req)
+            if r.code == 404:
+                return False, "the %s:%s not found, may be deleted" % (repository, tag)
+            digest = r.headers['docker-content-digest']
+        except urllib2.URLError as e:
+            return False, "get %s:%s digest is error, the code: %s" % (repository, tag, e.code)
+        finally:
+            self.remove_schema()
+
+        # send DELETE the image
+        req = urllib2.Request(self.url + '/' + repository + '/manifests/' + digest, headers=self.headers)
         req.get_method = lambda: 'DELETE'
         try:
             r = urllib2.urlopen(req)
-            if r.getCode() == 202:
-                return True
-            return False
-        except Exception as e:
-            print("delete image is exception: %s", e)
-            return None
-
+            if r.code == 202:
+                return True, "delete will take time"
+            return False, "the code：%s" % r.code
+        except urllib2.URLError as e:
+            return False, "delete image is exception, the code: %s" % e.code
