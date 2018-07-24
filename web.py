@@ -48,7 +48,7 @@ def delete():
     message = result[1]
     if status:
         time.sleep(1)
-        redirect("/tags?repository=" % repository)
+        return redirect("/tags?repository=%s" % replace_backslash(repository))
     else:
         return render_template('error.html', repository=repository, error=message)
 
