@@ -49,7 +49,7 @@ class V2(object):
             tags = json.loads(r.read())
             return tags['tags']
         except Exception as e:
-            return []
+            return None
 
 
     def add_schema(self):
