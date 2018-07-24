@@ -41,11 +41,14 @@ def tags():
 @app.route('/delete')
 def delete():
     repository = request.args.get('repository')
-    reference = request.args.get('reference')
-    if g.reg.delete(repository, reference):
+    tag = request.args.get('tag')
+    result = g.reg.delete(repository, tag)
+    status = result[0]
+    message = result[1]
+    if status:
         return tags(repository)
     else:
-        return render_template('error.html', repository=repository, error='error or not exist')
+        return render_template('error.html', repository=repository, error=message)
 
 
 def replace_backslash(value):

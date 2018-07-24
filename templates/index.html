@@ -3,87 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <title>docker-registry-ui</title>
-    <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/bootstrap.min.css')}}>
-    <link rel="stylesheet" type="text/css" href={{url_for('static', filename='css/dataTables.bootstrap.min.css')}}>
-    <link rel="shortcut icon" href={{url_for('static', filename='favicon.ico')}}>
-    <link rel="apple-touch-icon" sizes="128x128" href={{url_for('static', filename='favicon-128x128.ico')}} />
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/bootstrap.min.css') }}>
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/dataTables.bootstrap.min.css') }}>
+    <link rel="shortcut icon" href={{ url_for('static', filename='favicon.ico') }}>
+    <link rel="apple-touch-icon" sizes="128x128" href={{ url_for('static', filename='favicon-128x128.ico') }}/>
     <style>
-        .wrap{
+        .wrap {
             padding: 0 100px;
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid wrap">
-        {% if data %}
+<div class="container-fluid wrap">
+    {% if data %}
         <h1 class="page-header"> Repositories </h1>
-        {% elif info %}
+    {% elif info %}
         <h1 class="page-header"> Tag </h1>
+    {% endif %}
+
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% if info %}
+            <li class="active">{{ repository }}</li>
         {% endif %}
+    </ol>
 
-        <ol class="breadcrumb">
-            <li><a href="/">Home</a></li>
-            {% if info %}
-             <li class="active">{{repository}}</li>
-            {% endif %}
-        </ol>
+    <table class="table table-striped table-bordered">
+        {% if data %}
+            <thead>
+            <tr>
+                <th>Repository</th>
+                <th>Tag</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in data %}
+                <tr>
+                    <td><a href="/tags?repository={{ i | replace_backslash }}">{{ i }}</a></td>
+                    <td>{{ data[i]|length }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        {% elif info %}
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Pull</th>
+                <th>Created</th>
+                <th>Fslayers</th>
+                <th>Size</th>
+                <th>Manager</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in info %}
+                {% if i %}
+                    <tr>
+                        <td>{{ i.id }}</td>
+                        <td>docker pull {{ uri }}/{{ repository }}:{{ i.tag }}</td>
+                        <td>{{ i.created }}</td>
+                        <td>{{ i.fslayers }}</td>
+                        <td>{{ i.size }}MB</td>
+                        <td><a class="btn btn-primary btn-sm"
+                               onClick="delcfm('/delete?repository={{ repository }}&tag={{ i.tag }}')">Del</a></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        {% endif %}
+    </table>
+</div>
 
-        <table class="table table-striped table-bordered">
-            {% if data %}
-                <thead>
-                    <tr>
-                        <th>Repository</th>
-                        <th>Tag</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in data %}
-                    <tr>
-                        <td><a href="/tags?repository={{ i | replace_backslash }}">{{ i }}</a></td>
-                        <td>{{ data[i]|length }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            {% elif info %}
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tag</th>
-                        <th>Pull</th>
-                        <th>Digest</th>
-                        <th>Created</th>
-                        <th>Fslayers</th>
-                        <th>Size</th>
-                        <th>Del</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in info %}
-                        {% if i %}
-                        <tr>
-                            <td>{{ i.id }}</td>
-                            <td>{{ i.tag }}</td>
-                            <td>docker pull {{ uri }}/{{ repository }}:{{ i.tag }}</td>
-                            <td>{{ i.digest }}</td>
-                            <td>{{ i.created }}</td>
-                            <td>{{ i.fslayers }}</td>
-                            <td>{{ i.size }}MB</td>
-                            <td><a href="/delete?repository={{ repository }}&reference={{ i.digest }}">Del</a></td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            {% endif %}
-        </table>
+<div class="modal fade" id="delcfmModel">
+    <div class="modal-dialog">
+        <div class="modal-content message_align">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Prompt message</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete?</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="url"/>
+                <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+                <a onclick="urlSubmit()" class="btn btn-success" data-dismiss="modal">confirm</a>
+            </div>
+        </div>
     </div>
+</div>
 </body>
-<script src={{url_for('static', filename='js/jquery-3.3.1.min.js')}}></script>
-<script src={{url_for('static', filename='js/bootstrap.min.js')}}></script>
-<script src={{url_for('static', filename='js/jquery.dataTables.min.js')}}></script>
-<script src={{url_for('static', filename='js/dataTables.bootstrap.min.js')}}></script>
+<script src={{ url_for('static', filename='js/jquery-3.3.1.min.js') }}></script>
+<script src={{ url_for('static', filename='js/bootstrap.min.js') }}></script>
+<script src={{ url_for('static', filename='js/jquery.dataTables.min.js') }}></script>
+<script src={{ url_for('static', filename='js/dataTables.bootstrap.min.js') }}></script>
 <script type="text/javascript">
-    ;$(function(){
+    ;$(function () {
         $("table").DataTable();
     });
+
+    function delcfm(url) {
+        $('#url').val(url);
+        $('#delcfmModel').modal();
+    }
+
+    function urlSubmit() {
+        var url = $.trim($("#url").val());
+        window.location.href = url;
+    }
 </script>
 </html>

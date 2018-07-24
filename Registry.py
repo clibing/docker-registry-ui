@@ -89,9 +89,21 @@ class V2(object):
             re_tags[i] = self.tags(i)
         return re_tags
 
-    def delete(self, repository, reference):
-        req = urllib2.Request(self.url + '/' + repository + '/manifests/' + reference.replace(':', '%3a'),
-                              headers=self.headers)
+    def delete(self, repository, tag):
+        self.add_schema()
+        try:
+            req = urllib2.Request(self.url + '/' + repository + '/manifests/' + tag, headers=self.headers)
+            r = urllib2.urlopen(req)
+            if r.code == 404:
+                return False, "the %s:%s not found, may be deleted" % (repository, tag)
+            digest = r.headers['docker-content-digest']
+        except urllib2.URLError as e:
+            return False, "get %s:%s digest is error, the code: %s" % (repository, tag, e.code)
+        finally:
+            self.remove_schema()
+
+        # send DELETE the image
+        req = urllib2.Request(self.url + '/' + repository + '/manifests/' + digest, headers=self.headers)
         req.get_method = lambda: 'DELETE'
         try:
             r = urllib2.urlopen(req)
@@ -101,3 +113,9 @@ class V2(object):
         except Exception as e:
             print("delete image is exception: %s", e)
             return None
+
+            if r.code == 202:
+                return True, "delete will take time"
+            return False, "the code：%s" % r.code
+        except urllib2.URLError as e:
+            return False, "delete image is exception, the code: %s" % e.code
