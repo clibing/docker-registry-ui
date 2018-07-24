@@ -19,6 +19,6 @@ build-image:
     - docker rmi ${IMAGE_NAME}
     - docker rmi ${DOCKER_REGISTRY}/${IMAGE_NAME}
   tags:
-    - armhf
+    - raspberrypi
   when: manual
 
