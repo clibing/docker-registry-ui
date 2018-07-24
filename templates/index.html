@@ -60,7 +60,7 @@
                 {% if i %}
                     <tr>
                         <td>{{ i.id }}</td>
-                        <td>docker pull {{ uri }}/{{ repository }}:{{ i.tag }}</td>
+                        <td>docker pull {{ uri }}/{{ repository }}:<strong>{{ i.tag }}</strong></td>
                         <td>{{ i.created }}</td>
                         <td>{{ i.fslayers }}</td>
                         <td>{{ i.size }}MB</td>
