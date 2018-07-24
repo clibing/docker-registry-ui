@@ -6,6 +6,7 @@ import datetime
 import json
 import time
 import urllib2
+
 BASE_CONTENT_TYPE = 'application/vnd.docker.distribution.manifest'
 
 
@@ -51,7 +52,6 @@ class V2(object):
         except Exception as e:
             return None
 
-
     def add_schema(self):
         self.headers['Accept'] = self.__schema
 
@@ -78,6 +78,8 @@ class V2(object):
             created_time = created_time - datetime.timedelta(0, time.timezone)
             re_data['created'] = created_time.strftime("%Y-%m-%d %H:%M:%S")
             re_data['fslayers'] = len(html['fsLayers'])
+            if size == 0:
+                size = self.layers_size(response, tag)
             re_data['size'] = size / 1024 / 1024
             re_data['digest'] = r.headers['Docker-Content-Digest']
             return re_data
@@ -122,3 +124,19 @@ class V2(object):
             return False, "the code：%s" % r.code
         except Exception as e:
             return False, "delete image is exception, the code: %s" % e.code
+
+    def layers_size(self, repository, tag):
+        self.add_schema()
+        try:
+            req = urllib2.Request(self.url + '/' + repository + '/manifests/' + tag, headers=self.headers)
+            r = urllib2.urlopen(req)
+            layers = json.loads(r.read())
+            size = 0
+            for layer in layers['layers']:
+                size += layer['size']
+            size += layers['config']['size']
+            return size
+        except Exception as e:
+            return 0
+        finally:
+            self.remove_schema()
