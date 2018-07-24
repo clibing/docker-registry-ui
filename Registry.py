@@ -1,22 +1,21 @@
 #!/usr/bin/python
 # -*- coding:UTF-8 -*-
 
-import urllib2, json, base64, datetime, time
-
+import base64
+import datetime
+import json
+import time
+import urllib2
 BASE_CONTENT_TYPE = 'application/vnd.docker.distribution.manifest'
 
 
 class V2(object):
-    '''
-    Connect Private Registry Restful API v2
-    '''
-
+    # Connect Private Registry Restful API v2
     def __init__(self, url, user=None, password=None, debug=False):
-        '''
-        url: Registry Service URL
-        user: Basic Authorization User,default None
-        pasword: Basic Authorization Password,default None
-        '''
+        # url: Registry Service URL
+        # user: Basic Authorization User,default None
+        # password: Basic Authorization Password,default None
+
         self.url = url + '/v2'
         self.__debug = debug
         self.__schema = BASE_CONTENT_TYPE + '.v2+json'
@@ -34,7 +33,7 @@ class V2(object):
             return 'OK'
         except Exception as e:
             if self.__debug:
-                print("execption when ping url: %s, the execption: %s" % (self.url, e))
+                print("exception when ping url: %s, the execption: %s" % (self.url, e))
             return 'Error'
 
     def catalog(self):
@@ -57,7 +56,6 @@ class V2(object):
 
     def digest(self, response, tag):
         re_data = {}
-        # self.add_schema()
         req = urllib2.Request(self.url + '/' + response + '/manifests/' + tag, headers=self.headers)
         try:
             r = urllib2.urlopen(req)
@@ -68,7 +66,7 @@ class V2(object):
                     size += json.loads(i['v1Compatibility'])['Size']
 
             re_data['tag'] = tag
-            v1_compatibility = json.loads(html['history'][0]['v1Compatibility']);
+            v1_compatibility = json.loads(html['history'][0]['v1Compatibility'])
             re_data['id'] = v1_compatibility['id'][:13]
             created_time = v1_compatibility['created']
             created_time = created_time[:-4]
@@ -81,18 +79,15 @@ class V2(object):
             return re_data
         except Exception as e:
             if self.__debug:
-                print("cause execption when digest the response: %s, the tag: %s, detail execption: %s" % (
+                print("cause exception when digest the response: %s, the tag: %s, detail execption: %s" % (
                     response, tag, e))
             return None
-        finally:
-            pass
-            # self.remove_schema()
 
-    def retag(self):
-        self.retags = {}
+    def repository_tags(self):
+        re_tags = {}
         for i in self.catalog():
-            self.retags[i] = self.tags(i)
-        return self.retags
+            re_tags[i] = self.tags(i)
+        return re_tags
 
     def delete(self, repository, reference):
         req = urllib2.Request(self.url + '/' + repository + '/manifests/' + reference.replace(':', '%3a'),
@@ -106,4 +101,3 @@ class V2(object):
         except Exception as e:
             print("delete image is exception: %s", e)
             return None
-
