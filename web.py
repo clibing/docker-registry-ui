@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, g, render_template
+from flask import Flask, request, g, render_template, redirect
 from Registry import V2
 import os
 import time
@@ -47,8 +47,8 @@ def delete():
     status = result[0]
     message = result[1]
     if status:
-        time.sleep(2)
-        return tags(repository)
+        time.sleep(1)
+        redirect("/tags?repository=" % repository)
     else:
         return render_template('error.html', repository=repository, error=message)
 
