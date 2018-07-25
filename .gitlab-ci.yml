@@ -23,6 +23,7 @@ create-cache:
     - echo "export BUILD_DATE=${BUILD_DATE}">cache/version
     - echo "export IMAGE_NAME=${IMAGE_NAME}">>cache/version
     - echo "export HUB_IMAGE_NAME=${HUB_IMAGE_NAME}">>cache/version
+    - cat cache/version
   tags:
     - raspberrypi
 
@@ -61,7 +62,7 @@ push-public:
   when: manual
 
 delele-image:
-  stage: build
+  stage: delete
   script:
     - source cache/version
     - docker rmi ${DOCKER_REGISTRY}/${IMAGE_NAME}
