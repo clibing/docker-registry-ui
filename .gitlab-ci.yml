@@ -12,7 +12,7 @@ stages:
 cache:
   key: $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME-$CI_COMMIT_SHA
   paths:
-    - target
+    - cache
 
 create-cache:
   stage: create-caching
@@ -32,6 +32,7 @@ image-build:
   stage: build
   script:
     - source cache/version
+    - cat cache/version
     - docker build -t ${IMAGE_NAME} .
     - docker tag ${IMAGE_NAME} ${HUB_IMAGE_NAME}
   tags:
