@@ -4,23 +4,62 @@ before_script:
   - env
 
 stages:
+  - create-caching
   - build
+  - push
+  - delete
 
-build-image:
-  stage: build
+cache:
+  key: $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME-$CI_COMMIT_SHA
+  paths:
+    - target
+
+create-cache:
+  stage: create-caching
   script:
     - export BUILD_DATE=`date +%Y%m%d%H%M%S`
     - export IMAGE_NAME=${DOCKER_REGISTRY_USER}/armhf-docker-registry-ui:${BUILD_DATE}
-    - echo "IMAGE_NAME ${IMAGE_NAME}"
-    - echo "DOCKER_REGISTRY ${DOCKER_REGISTRY}"
+    - export HUB_IMAGE_NAME=${DOCKER_REGISTRY}/${IMAGE_NAME}
+    - echo "export BUILD_DATE=${BUILD_DATE}">cache/version
+    - echo "export IMAGE_NAME=${IMAGE_NAME}">>cache/version
+    - echo "export HUB_IMAGE_NAME=${HUB_IMAGE_NAME}">>cache/version
+
+image-build:
+  stage: build
+  script:
+    - source cache/version
     - docker build -t ${IMAGE_NAME} .
     - docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}
+
+
+push-local:
+  stage: push
+  script:
+    - source cache/version
+    - docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}
+    - echo "DOCKER_REGISTRY ${DOCKER_REGISTRY}"
+  tags:
+    - raspberrypi
+  when: manual
+
+
+push-public:
+  stage: push
+  script:
+    - source cache/version
     - docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
     - docker push ${IMAGE_NAME}
-    - docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}
+    - echo "IMAGE_NAME ${IMAGE_NAME}"
+  tags:
+    - raspberrypi
+  when: manual
+
+delele-image:
+  stage: build
+  script:
+    - source cache/version
     - docker rmi ${DOCKER_REGISTRY}/${IMAGE_NAME}
     - docker rmi ${IMAGE_NAME}
   tags:
     - raspberrypi
   when: manual
-
