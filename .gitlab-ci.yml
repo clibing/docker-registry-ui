@@ -19,7 +19,7 @@ create-cache:
   script:
     - export BUILD_DATE=`date +%Y%m%d%H%M%S`
     - export HUB_IMAGE_NAME=${DOCKER_REGISTRY_USER}/armhf-docker-registry-ui:${BUILD_DATE}
-    - export IMAGE_NAME=${DOCKER_REGISTRY}/${IMAGE_NAME}
+    - export IMAGE_NAME=${DOCKER_REGISTRY}/${HUB_IMAGE_NAME}
     - echo "export BUILD_DATE=${BUILD_DATE}">cache/version
     - echo "export IMAGE_NAME=${IMAGE_NAME}">>cache/version
     - echo "export HUB_IMAGE_NAME=${HUB_IMAGE_NAME}">>cache/version
