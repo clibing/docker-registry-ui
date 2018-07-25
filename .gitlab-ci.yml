@@ -23,6 +23,9 @@ create-cache:
     - echo "export BUILD_DATE=${BUILD_DATE}">cache/version
     - echo "export IMAGE_NAME=${IMAGE_NAME}">>cache/version
     - echo "export HUB_IMAGE_NAME=${HUB_IMAGE_NAME}">>cache/version
+  tags:
+    - raspberrypi
+
 
 image-build:
   stage: build
@@ -30,6 +33,9 @@ image-build:
     - source cache/version
     - docker build -t ${IMAGE_NAME} .
     - docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}
+  tags:
+    - raspberrypi
+  when: manual
 
 
 push-local:
