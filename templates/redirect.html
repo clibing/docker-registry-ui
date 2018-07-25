@@ -24,6 +24,10 @@
                 <a class="close" data-dismiss="alert">×</a>
                 <h4 class="alert-heading">Warning!</h4>
                 {{ error }}
+                {% if timeout > 0 %}
+                    <br/>
+                    Countdown automatic jump! <span class="timeShow" id="timers">{{ timeout }}</span>s
+                {% endif %}
             </div>
         </div>
     </div>
@@ -31,4 +35,18 @@
 </body>
 <script src={{ url_for('static', filename='js/jquery-1.12.0.min.js') }}></script>
 <script src={{ url_for('static', filename='js/bootstrap.js') }}></script>
+<script type="text/javascript">
+    window.onload = function () {
+        var i = {{ timeout }};
+        var tim = document.getElementById("timers");
+        var timer = setInterval(function () {
+            if (i == 0) {
+                clearInterval(timer);
+            } else {
+                tim.innerHTML = i;
+                --i;
+            }
+        }, 1000);
+    }
+</script>
 </html>
